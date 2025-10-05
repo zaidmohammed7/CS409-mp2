@@ -1,3 +1,4 @@
+// src/pages/DetailsPage.tsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import usePokemonIndex from "../hooks/usePokemonIndex";
@@ -6,43 +7,47 @@ import type { PokemonDetails } from "../types/pokemon";
 import { useSearchCtx } from "../context/SearchContext";
 import styles from "./DetailsPage.module.css";
 
-/**
- * DetailsPage
- * - Works with context.resultIds for prev/next
- * - If user deep-links (no context), falls back to full Gen-1 index
- */
 export default function DetailsPage() {
   const { id } = useParams();
   const nav = useNavigate();
   const numericId = Number(id);
+  const isGen1 = Number.isFinite(numericId) && numericId >= 1 && numericId <= 151;
+
+  // Hooks must be called every render, unconditionally:
   const [poke, setPoke] = useState<PokemonDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { resultIds } = useSearchCtx();
   const { data: index } = usePokemonIndex();
 
-  // Guard for your Gen-1 scope
-  if (!(numericId >= 1 && numericId <= 151)) {
-    return <div className={styles.warning}>Only Generation-1 is supported in this Pokédex.</div>;
-  }
-
+  // Effect is always declared; we branch *inside* it.
   useEffect(() => {
     let cancel = false;
+
+    // reset state whenever the ID changes
+    setError(null);
+    setPoke(null);
+
+    // Only fetch if Gen-1 and a valid number
+    if (!isGen1) return;
+
     (async () => {
       try {
-        setError(null);
         const d = await fetchPokemon(numericId);
         if (!cancel) setPoke(d);
       } catch (e: any) {
         if (!cancel) setError(e.message || "Failed to load");
       }
     })();
-    return () => { cancel = true; };
-  }, [numericId]);
 
-  // Use context if available, otherwise full Gen-1 index
+    return () => {
+      cancel = true;
+    };
+  }, [numericId, isGen1]);
+
+  // Use context list if present; otherwise fall back to full Gen-1 index
   const listForNav = useMemo(() => {
     if (resultIds && resultIds.length > 0) return resultIds;
-    return [...index.map(p => p.id)].sort((a, b) => a - b); // Gen-1 because your index is filtered already
+    return [...index.map(p => p.id)].sort((a, b) => a - b);
   }, [resultIds, index]);
 
   const { prevId, nextId } = useMemo(() => {
@@ -52,6 +57,11 @@ export default function DetailsPage() {
       nextId: i >= 0 && i < listForNav.length - 1 ? listForNav[i + 1] : undefined,
     };
   }, [listForNav, numericId]);
+
+  // Now it’s safe to conditionally return different UI
+  if (!isGen1) {
+    return <div className={styles.warning}>Only Generation-1 is supported in this Pokédex.</div>;
+  }
 
   if (error) return <p style={{ color: "crimson", textAlign: "center" }}>{error}</p>;
   if (!poke) return <p style={{ textAlign: "center" }}>Loading…</p>;
