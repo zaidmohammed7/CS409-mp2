@@ -1,0 +1,14 @@
+.toolbar {
+  display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;
+}
+.btn { border:0; border-radius:8px; padding:8px 12px; cursor:pointer; background:#e6eefb; }
+.btn[aria-pressed="true"] { outline: 2px solid #acc2ff; }
+.grid {
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:16px;
+}
+.card { background: var(--card); padding: 12px; border-radius:12px; cursor:pointer; }
+.art { width:100%; aspect-ratio:1/1; object-fit:contain; image-rendering: pixelated; background:white; border-radius:12px; }
+.title { margin-top:8px; text-align:center; font-weight:600; color: var(--accent); text-transform: capitalize; }
+.sub { text-align:center; opacity:.7; }
+.center { display:flex; justify-content:center; margin:16px 0; }
+.status { opacity:.8; text-align:center; }

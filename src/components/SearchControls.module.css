@@ -1,0 +1,4 @@
+.card { background: var(--card); padding: 16px; border-radius: 12px; }
+.controls { display:grid; gap:10px; }
+.inline { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.radio { display:flex; align-items:center; gap:8px; }

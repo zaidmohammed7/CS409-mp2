@@ -1,0 +1,5 @@
+.list { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.item { display:flex; gap:12px; align-items:center; background:white; border-radius:12px; padding:10px; cursor:pointer; }
+.img { width:64px; height:64px; image-rendering: pixelated; }
+.name { font-weight:700; color: var(--accent); }
+.meta { opacity:.7; }
